@@ -15,6 +15,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using GenshinFarm.Infrastructure.Service;
+using GenshinFarm.Core.Services;
 
 namespace GenshinApi
 {
@@ -35,6 +36,7 @@ namespace GenshinApi
             //new DbPlanter(services);
             services.Configure<PasswordOptions>(options => Configuration.GetSection("PasswordOptions").Bind(options));
             services.AddTransient<IUnitOfWork, UnitOfWork>();
+            services.AddTransient<IUserService, UserService>();
             services.AddSingleton<IPasswordService, PasswordService>();
             services.AddControllers();
             services.AddCors(c =>

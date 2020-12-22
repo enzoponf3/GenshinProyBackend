@@ -5,6 +5,7 @@ using GenshinFarm.Infrastructure.Options;
 using System.Security.Cryptography;
 using GenshinFarm.Core.Entities;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace GenshinFarm.Infrastructure.Service
 {
@@ -35,8 +36,9 @@ namespace GenshinFarm.Infrastructure.Service
             }
         }
 
-        public void Hash(User user, string password)
+        public List<string> Hash(string password)
         {
+            List<string> list = new List<string> ();
             //PBKDF2 implementation
             using (var algorithm = new Rfc2898DeriveBytes(
                 password,
@@ -46,9 +48,10 @@ namespace GenshinFarm.Infrastructure.Service
             {
                 var key = Convert.ToBase64String(algorithm.GetBytes(_passwordOptions.KeySize));
                 var salt = Convert.ToBase64String(algorithm.Salt);
-                user.Password = key;
-                user.Salt = salt;
+                list.Add(key);
+                list.Add(salt);
             }
+            return list;
         }
     }
 }
