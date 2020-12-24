@@ -1,10 +1,6 @@
 ﻿using AutoMapper;
 using GenshinFarm.Core.DTOs;
 using GenshinFarm.Core.Entities;
-using GenshinFarm.Core.Enumerations;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace GenshinFarm.Infrastructure.Mappings
 {

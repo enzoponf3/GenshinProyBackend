@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenshinFarm.Core", "Genshin
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenshinFarm.Infrastructure", "GenshinFarm.Infrastructure\GenshinFarm.Infrastructure.csproj", "{D79D0714-7791-473E-97AF-9AC267182E33}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GenshinFarm.UnitTests", "GenshinFarm.UnitTests\GenshinFarm.UnitTests.csproj", "{984E9289-8DF5-4B27-B358-FAED66B026EF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{D79D0714-7791-473E-97AF-9AC267182E33}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D79D0714-7791-473E-97AF-9AC267182E33}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D79D0714-7791-473E-97AF-9AC267182E33}.Release|Any CPU.Build.0 = Release|Any CPU
+		{984E9289-8DF5-4B27-B358-FAED66B026EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{984E9289-8DF5-4B27-B358-FAED66B026EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{984E9289-8DF5-4B27-B358-FAED66B026EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{984E9289-8DF5-4B27-B358-FAED66B026EF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

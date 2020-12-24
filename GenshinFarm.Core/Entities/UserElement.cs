@@ -8,18 +8,18 @@ namespace GenshinFarm.Core.Entities
         {
             this.Id = Guid.NewGuid().ToString();
             this.Lvl = lvl;
-            setPowerLvl(Lvl);
+            setPowerLvl();
         }
 
-        public void setPowerLvl(int lvl)
+        public void setPowerLvl()
         {
-            if(lvl > 90 || lvl < 0) { throw new ArgumentOutOfRangeException("lvl", "Lvl must be between 0 and 90"); }
-            int result = lvl > 20 ? 1 : 0;
-            result = lvl > 40 ? 2 : result;
-            result = lvl > 50 ? 3 : result;
-            result = lvl > 60 ? 4 : result;
-            result = lvl > 70 ? 5 : result;
-            result = lvl > 80 ? 6 : result;
+            if(Lvl > 90 || Lvl < 0) { throw new ArgumentOutOfRangeException("Lvl must be between 0 and 90"); }
+            int result = Lvl > 20 ? 1 : 0;
+            result = Lvl > 40 ? 2 : result;
+            result = Lvl > 50 ? 3 : result;
+            result = Lvl > 60 ? 4 : result;
+            result = Lvl > 70 ? 5 : result;
+            result = Lvl > 80 ? 6 : result;
             this.PowerLvl = result;
         }
 

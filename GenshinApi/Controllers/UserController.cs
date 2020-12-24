@@ -73,6 +73,7 @@ namespace GenshinFarm.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<ActionResult> Add(UserDto userDto)
         {
+            userDto.Id = Guid.NewGuid().ToString();
             var user = _mapper.Map<User>(userDto);
             List<string> passwordHashed = _passwordService.Hash(user.Password);
             user.Password = passwordHashed[0];
@@ -110,6 +111,25 @@ namespace GenshinFarm.Api.Controllers
         public async Task<ActionResult> Delete(string id)
         {
             if(await _userService.Delete(id)) { return BadRequest("User doesn't exists."); }
+            return Ok();
+        }
+
+        [HttpPost("{id}")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<ActionResult> AddElement(string userId, UserElementDto userElementDto)
+        {
+            userElementDto.Id = Guid.NewGuid().ToString();
+            var userElement = _mapper.Map<UserElement>(userElementDto);
+            userElement.setPowerLvl();
+            try
+            {
+                await _userService.AddElement(userId, userElement);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
             return Ok();
         }
     }

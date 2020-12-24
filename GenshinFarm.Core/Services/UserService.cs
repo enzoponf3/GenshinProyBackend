@@ -1,4 +1,5 @@
-﻿using GenshinFarm.Core.Entities;
+﻿using GenshinFarm.Core.DTOs;
+using GenshinFarm.Core.Entities;
 using GenshinFarm.Core.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -18,7 +19,7 @@ namespace GenshinFarm.Core.Services
         }
         public async Task Add(User entity)
         {
-            Regex regex = new Regex(@"[a-zA-Z0-9-._@+]");
+            Regex regex = new Regex(@"^[a-zA-Z0-9-._@+]+$", RegexOptions.Compiled);
             if (!regex.IsMatch(entity.Username))
             {
                 throw new ArgumentOutOfRangeException("Invalid username, characters allowed are: 'a-z', 'A-Z', '0-9', '-._@+'");
@@ -31,6 +32,17 @@ namespace GenshinFarm.Core.Services
             }
             await _unitOfWork.UserRepository.Add(entity);
             await _unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task AddElement(string userId, UserElement userElement)
+        {
+            var user = await _unitOfWork.UserRepository.GetById(userId);
+            if(user == null) { throw new ArgumentException("The user doesn't exists."); }
+            var existingElement = user.UserElement.FirstOrDefault(e => e.ElementId == userElement.ElementId);
+            if(existingElement != null) { throw new ArgumentException("The user already had the element."); }
+            user.UserElement.Add(userElement);
+            _unitOfWork.UserRepository.Update(user);
+            await _unitOfWork.SaveChangesAsync();            
         }
 
         public async Task<bool> Delete(string id)
