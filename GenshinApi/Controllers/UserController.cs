@@ -76,7 +76,6 @@ namespace GenshinFarm.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(UserDto))]
         [ProducesResponseType((int)HttpStatusCode.Conflict)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [Authorize]
         public async Task<ActionResult> Add(UserDto userDto)
         {
             userDto.Id = Guid.NewGuid().ToString();
