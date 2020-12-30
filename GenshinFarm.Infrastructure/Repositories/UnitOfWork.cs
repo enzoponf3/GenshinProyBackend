@@ -13,7 +13,7 @@ namespace GenshinFarm.Infrastructure.Repositories
         private readonly BaseRepository<Material> _materialRepository;
         private readonly BaseRepository<Talent> _talentRepository;
         private readonly BaseRepository<Weapon> _weaponLocationRepository;
-        private readonly BaseRepository<User> _userLocationRepository;
+        private readonly UserRepository _userLocationRepository;
 
         public UnitOfWork(GenshinDbContext context)
         {
@@ -24,7 +24,7 @@ namespace GenshinFarm.Infrastructure.Repositories
         public IRepository<Material> MaterialRepository => _materialRepository ?? new BaseRepository<Material>(_context);
         public IRepository<Talent> TalentRepository => _talentRepository ?? new BaseRepository<Talent>(_context);
         public IRepository<Weapon> WeaponRepository => _weaponLocationRepository ?? new BaseRepository<Weapon>(_context);
-        public IRepository<User> UserRepository => _userLocationRepository ?? new UserRepository(_context);
+        public IUserRepository UserRepository => _userLocationRepository ?? new UserRepository(_context);
         public async Task SaveChangesAsync()
         {
             await _context.SaveChangesAsync();

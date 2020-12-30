@@ -45,6 +45,11 @@ namespace GenshinFarm.Core.Services
             await _unitOfWork.SaveChangesAsync();            
         }
 
+        public Task AddElements(string userId, ICollection<UserElement> userElements)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<bool> Delete(string id)
         {
             var user = await _unitOfWork.UserRepository.GetById(id);
@@ -64,6 +69,11 @@ namespace GenshinFarm.Core.Services
             var user = await _unitOfWork.UserRepository.GetById(id);
             if (user == null) { throw new ArgumentException($"There is not User with the id: {id}."); }
             return user;
+        }
+
+        public async Task<User> GetLoginByCredentials(UserLogin login)
+        {
+            return await _unitOfWork.UserRepository.LoginByCredentials(login);
         }
 
         public async Task<bool> Update(User entity)

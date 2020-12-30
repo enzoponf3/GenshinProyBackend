@@ -38,6 +38,7 @@ namespace GenshinApi
             services.AddTransient<IUnitOfWork, UnitOfWork>();
             services.AddTransient<IUserService, UserService>();
             services.AddSingleton<IPasswordService, PasswordService>();
+
             services.AddControllers();
             services.AddCors(c =>
             {

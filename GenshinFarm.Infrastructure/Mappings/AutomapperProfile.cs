@@ -18,6 +18,8 @@ namespace GenshinFarm.Infrastructure.Mappings
                 .ReverseMap();
             CreateMap<Talent, TalentDto>()
                 .ReverseMap();
+            CreateMap<User, UserDto>()
+                .ReverseMap();
         }
     }
 }

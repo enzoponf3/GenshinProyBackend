@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace GenshinFarm.Api.Controllers
 {
     [Produces("application/json")]
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class UserController : ControllerBase
     {
@@ -78,6 +78,8 @@ namespace GenshinFarm.Api.Controllers
             List<string> passwordHashed = _passwordService.Hash(user.Password);
             user.Password = passwordHashed[0];
             user.Salt = passwordHashed[1];
+            user.Role = Core.Enumerations.RoleType.Client;
+            user.LastTimeLoged = DateTime.Now;
             try
             {
                 await _userService.Add(user);
@@ -88,9 +90,14 @@ namespace GenshinFarm.Api.Controllers
                 return Conflict(e.Message);
             }
             userDto = _mapper.Map<UserDto>(user);
+            userDto.Password = "";
             return Ok(userDto);
         }
-
+        /// <summary>
+        /// Update the Username or email.
+        /// </summary>
+        /// <param name="userDto"></param>
+        /// <returns></returns>
         [HttpPut]
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(UserDto))]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
@@ -104,7 +111,11 @@ namespace GenshinFarm.Api.Controllers
             userDto = _mapper.Map<UserDto>(user);
             return Ok(userDto);
         }
-
+        /// <summary>
+        /// Delete the User by Id.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpDelete("{id}")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
@@ -113,18 +124,51 @@ namespace GenshinFarm.Api.Controllers
             if(await _userService.Delete(id)) { return BadRequest("User doesn't exists."); }
             return Ok();
         }
-
+        /// <summary>
+        /// Link a user with an elemnt by id.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="userElementDto"></param>
+        /// <returns></returns>
         [HttpPost("{id}")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public async Task<ActionResult> AddElement(string userId, UserElementDto userElementDto)
+        public async Task<ActionResult> AddElement(string id, UserElementDto userElementDto)
         {
             userElementDto.Id = Guid.NewGuid().ToString();
             var userElement = _mapper.Map<UserElement>(userElementDto);
             userElement.setPowerLvl();
             try
             {
-                await _userService.AddElement(userId, userElement);
+                await _userService.AddElement(id, userElement);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+            return Ok();
+        }
+        /// <summary>
+        /// Link multiple elements to the User.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="userElementsDto"></param>
+        /// <returns></returns>
+        [HttpPost("{id}")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<ActionResult> AddElements(string id, ICollection<UserElementDto> userElementsDto)
+        {
+
+            ICollection<UserElement> userElement = _mapper.Map<ICollection<UserElement>>(userElementsDto);
+            foreach(UserElement elem in userElement)
+            {
+                elem.Id = Guid.NewGuid().ToString();
+                elem.setPowerLvl();
+            };
+            try
+            {
+                await _userService.AddElements(id, userElement);
             }
             catch (Exception e)
             {

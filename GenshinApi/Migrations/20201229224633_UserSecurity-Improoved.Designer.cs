@@ -4,14 +4,16 @@ using GenshinFarm.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GenshinFarm.Api.Migrations
 {
     [DbContext(typeof(GenshinDbContext))]
-    partial class GenshinDbContextModelSnapshot : ModelSnapshot
+    [Migration("20201229224633_UserSecurity-Improoved")]
+    partial class UserSecurityImprooved
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

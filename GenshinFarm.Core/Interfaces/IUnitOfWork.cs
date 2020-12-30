@@ -13,7 +13,7 @@ namespace GenshinFarm.Core.Interfaces
         IRepository<Material> MaterialRepository { get; }
         IRepository<Talent> TalentRepository { get; }
         IRepository<FarmLocation> FarmLocationRepository { get; }
-        IRepository<User> UserRepository { get; }
+        IUserRepository UserRepository { get; }
         Task SaveChangesAsync();
     }
 }

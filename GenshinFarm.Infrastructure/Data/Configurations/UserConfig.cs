@@ -30,6 +30,8 @@ namespace GenshinFarm.Infrastructure.Data.Configurations
                    c => c.ToString(),
                    c => (RoleType)Enum.Parse(typeof(RoleType), c)
                );
+            builder.Property(u => u.Salt)
+                .HasMaxLength(256);
         }
     }
 }
