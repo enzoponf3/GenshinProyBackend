@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using GenshinFarm.Core.DTOs;
 using GenshinFarm.Core.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Net;
@@ -28,6 +29,7 @@ namespace GenshinFarm.Api.Controllers
         // GET: CharacterController
         [HttpGet(Name = nameof(Talents))]
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(IEnumerable<TalentDto>))]
+        [Authorize]
         public ActionResult Talents()
         {
             var talent = _unitOfWork.TalentRepository.GetAll();
@@ -43,6 +45,7 @@ namespace GenshinFarm.Api.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(IEnumerable<WeaponDto>))]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [Authorize]
         public async Task<ActionResult> Talents(string id)
         {
             var talent = await _unitOfWork.TalentRepository.GetById(id);

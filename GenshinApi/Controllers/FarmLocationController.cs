@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using GenshinFarm.Core.DTOs;
 using GenshinFarm.Core.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Net;
@@ -28,6 +29,7 @@ namespace GenshinFarm.Api.Controllers
         // GET: CharacterController
         [HttpGet(Name = nameof(FarmLocations))]
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(IEnumerable<FarmLocationDto>))]
+        [Authorize]
         public ActionResult FarmLocations()
         {
             var weapon = _unitOfWork.FarmLocationRepository.GetAll();
@@ -43,6 +45,7 @@ namespace GenshinFarm.Api.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(IEnumerable<FarmLocationDto>))]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [Authorize]
         public async Task<ActionResult> FarmLocations(string id)
         {
             var farmLocation = await _unitOfWork.FarmLocationRepository.GetById(id);

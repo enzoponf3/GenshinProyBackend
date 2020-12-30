@@ -2,6 +2,7 @@
 using GenshinFarm.Core.DTOs;
 using GenshinFarm.Core.Entities;
 using GenshinFarm.Core.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
@@ -31,6 +32,7 @@ namespace GenshinFarm.Api.Controllers
         // GET: CharacterController
         [HttpGet(Name = nameof(Materials))]
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(IEnumerable<MaterialDto>))]
+        [Authorize]
         public ActionResult Materials()
         {
             var characters = _unitOfWork.MaterialRepository.GetAll();
@@ -46,6 +48,7 @@ namespace GenshinFarm.Api.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(IEnumerable<MaterialDto>))]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [Authorize]
         public async Task<ActionResult> Materials(string id)
         {
             var material = await _unitOfWork.MaterialRepository.GetById(id);
@@ -56,6 +59,7 @@ namespace GenshinFarm.Api.Controllers
 
         [HttpPost]
         [ProducesResponseType((int)HttpStatusCode.OK)]
+        [Authorize]
         public async Task<ActionResult> UpdateMultiple(IEnumerable<MaterialDto> materialsDtos)
         {
 

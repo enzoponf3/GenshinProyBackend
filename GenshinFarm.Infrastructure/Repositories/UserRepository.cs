@@ -14,7 +14,7 @@ namespace GenshinFarm.Infrastructure.Repositories
         }
         public async Task<User> LoginByCredentials(UserLogin login)
         {
-            return await _entities.FirstOrDefaultAsync(x => x.Username == login.Username);
+            return await _entities.FirstOrDefaultAsync(x => x.Username == login.Username) ?? await _entities.FirstOrDefaultAsync(x => x.Email == login.Username);
         }
     }
 }

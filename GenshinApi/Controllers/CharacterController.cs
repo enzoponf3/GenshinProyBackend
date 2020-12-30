@@ -1,6 +1,9 @@
 ﻿using AutoMapper;
 using GenshinFarm.Core.DTOs;
+using GenshinFarm.Core.Entities;
+using GenshinFarm.Core.Enumerations;
 using GenshinFarm.Core.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Net;
@@ -9,7 +12,7 @@ using System.Threading.Tasks;
 namespace GenshinFarm.Api.Controllers
 {
     [Produces("application/json")]
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class CharacterController : ControllerBase
     {
@@ -28,6 +31,7 @@ namespace GenshinFarm.Api.Controllers
         // GET: CharacterController
         [HttpGet(Name = nameof(Characters))]
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(IEnumerable<CharacterDto>))]
+        [Authorize]
         public ActionResult Characters()
         {
             var characters = _unitOfWork.CharacterRepository.GetAll();
@@ -43,6 +47,7 @@ namespace GenshinFarm.Api.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(IEnumerable<CharacterDto>))]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [Authorize]
         public async Task<ActionResult> Character(string id)
         {
             var character = await _unitOfWork.CharacterRepository.GetById(id);
@@ -51,73 +56,19 @@ namespace GenshinFarm.Api.Controllers
             return Ok(charDto);
         }
 
-        // GET: CharacterController/Details/5
-        //public ActionResult Details(int id)
-        //{
-        //    return Ok();
-        //}
+        [HttpPut]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(CharacterDto))]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [Authorize(Roles = "Administrator")]
+        public async Task<ActionResult> Update(CharacterDto characterDto)
+        {
+            var character = _mapper.Map<Character>(characterDto);
+            if( await _unitOfWork.CharacterRepository.GetById(character.Id) == null) { return BadRequest(characterDto); }
+            _unitOfWork.CharacterRepository.Update(character);
+            await _unitOfWork.SaveChangesAsync();
+            characterDto = _mapper.Map<CharacterDto>(character);
+            return Ok(characterDto);
+        }
 
-        //// GET: CharacterController/Create
-        //public ActionResult Create()
-        //{
-        //    return Ok();
-        //}
-
-        //// POST: CharacterController/Create
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public ActionResult Create(IFormCollection collection)
-        //{
-        //    try
-        //    {
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    catch
-        //    {
-        //        return View();
-        //    }
-        //}
-
-        //// GET: CharacterController/Edit/5
-        //public ActionResult Edit(int id)
-        //{
-        //    return View();
-        //}
-
-        //// POST: CharacterController/Edit/5
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public ActionResult Edit(int id, IFormCollection collection)
-        //{
-        //    try
-        //    {
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    catch
-        //    {
-        //        return View();
-        //    }
-        //}
-
-        //// GET: CharacterController/Delete/5
-        //public ActionResult Delete(int id)
-        //{
-        //    return View();
-        //}
-
-        //// POST: CharacterController/Delete/5
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public ActionResult Delete(int id, IFormCollection collection)
-        //{
-        //    try
-        //    {
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    catch
-        //    {
-        //        return View();
-        //    }
-        //}
     }
 }

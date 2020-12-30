@@ -3,6 +3,7 @@ using GenshinFarm.Core.DTOs;
 using GenshinFarm.Core.Entities;
 using GenshinFarm.Core.Interfaces;
 using GenshinFarm.Infrastructure.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -33,6 +34,7 @@ namespace GenshinFarm.Api.Controllers
         // GET: CharacterController
         [HttpGet(Name = nameof(Users))]
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(IEnumerable<UserDto>))]
+        [Authorize]
         public ActionResult Users()
         {
             var users = _userService.GetAll();
@@ -48,6 +50,7 @@ namespace GenshinFarm.Api.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(UserDto))]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [Authorize]
         public async Task<ActionResult> User(string id)
         {
             User user;
@@ -71,6 +74,7 @@ namespace GenshinFarm.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(UserDto))]
         [ProducesResponseType((int)HttpStatusCode.Conflict)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [Authorize]
         public async Task<ActionResult> Add(UserDto userDto)
         {
             userDto.Id = Guid.NewGuid().ToString();
@@ -101,6 +105,7 @@ namespace GenshinFarm.Api.Controllers
         [HttpPut]
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(UserDto))]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [Authorize]
         public async Task<ActionResult> Update(UserDto userDto)
         {
             var user = _mapper.Map<User>(userDto);
@@ -119,6 +124,7 @@ namespace GenshinFarm.Api.Controllers
         [HttpDelete("{id}")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [Authorize]
         public async Task<ActionResult> Delete(string id)
         {
             if(await _userService.Delete(id)) { return BadRequest("User doesn't exists."); }
@@ -133,6 +139,7 @@ namespace GenshinFarm.Api.Controllers
         [HttpPost("{id}")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [Authorize]
         public async Task<ActionResult> AddElement(string id, UserElementDto userElementDto)
         {
             userElementDto.Id = Guid.NewGuid().ToString();
@@ -157,6 +164,7 @@ namespace GenshinFarm.Api.Controllers
         [HttpPost("{id}")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [Authorize]
         public async Task<ActionResult> AddElements(string id, ICollection<UserElementDto> userElementsDto)
         {
 
