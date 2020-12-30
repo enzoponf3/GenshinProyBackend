@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using GenshinFarm.Core.DTOs;
 using GenshinFarm.Core.Interfaces;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Net;
@@ -10,6 +11,7 @@ namespace GenshinFarm.Api.Controllers
 {
     [Produces("application/json")]
     [Route("api/[controller]")]
+    [EnableCors("AllowOrigin")]
     [ApiController]
     public class WeaponController : ControllerBase
     {

@@ -4,6 +4,7 @@ using GenshinFarm.Core.Entities;
 using GenshinFarm.Core.Interfaces;
 using GenshinFarm.Infrastructure.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,7 @@ namespace GenshinFarm.Api.Controllers
 {
     [Produces("application/json")]
     [Route("api/[controller]/[action]")]
+    [EnableCors("AllowOrigin")]
     [ApiController]
     public class UserController : ControllerBase
     {
