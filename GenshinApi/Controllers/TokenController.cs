@@ -73,7 +73,7 @@ namespace GenshinFarm.Api.Controllers
         private string TokenGenerator(User user)
         {
             //Header
-            var symetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Authentication:SecretKey"]));
+            var symetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["SecretKey"]));
             var singingCredentials = new SigningCredentials(symetricSecurityKey, SecurityAlgorithms.HmacSha256);
             var header = new JwtHeader(singingCredentials);
 
@@ -87,8 +87,8 @@ namespace GenshinFarm.Api.Controllers
             //Payload
             var payload = new JwtPayload
             (
-                _configuration["Authentication:Issuer"],
-                _configuration["Authentication:Audience"],
+                _configuration["Issuer"],
+                _configuration["Audience"],
                 claims,
                 DateTime.Now,
                 DateTime.UtcNow.AddDays(7)
