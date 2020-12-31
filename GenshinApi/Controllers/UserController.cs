@@ -95,7 +95,7 @@ namespace GenshinFarm.Api.Controllers
                 return Conflict(e.Message);
             }
             userDto = _mapper.Map<UserDto>(user);
-            userDto.Password = "";
+            userDto.Password = "";           
             return Ok(userDto);
         }
         /// <summary>

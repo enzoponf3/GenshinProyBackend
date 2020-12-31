@@ -1,4 +1,5 @@
-﻿using GenshinFarm.Core.Entities;
+﻿using AutoMapper;
+using GenshinFarm.Core.Entities;
 using GenshinFarm.Core.Interfaces;
 using GenshinFarm.Infrastructure.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -8,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,12 +24,14 @@ namespace GenshinFarm.Api.Controllers
         private readonly IUserService _userService;
         private readonly IPasswordService _passwordService;
         private readonly IConfiguration _configuration;
+        public readonly IMapper _mapper;
 
-        public TokenController(IUserService userService, IPasswordService passwordService, IConfiguration configuration )
+        public TokenController(IUserService userService, IPasswordService passwordService, IConfiguration configuration, IMapper mapper )
         {
             _userService = userService;
             _passwordService = passwordService;
             _configuration = configuration;
+            _mapper = mapper;
         }
         /// <summary>
         /// Login the user.
@@ -35,6 +39,8 @@ namespace GenshinFarm.Api.Controllers
         /// <param name="login"></param>
         /// <returns>JWT</returns>
         [HttpPost]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest, Type = typeof(UserLogin))]
         public async Task<IActionResult> Authentication(UserLogin login)
         {
             var validation = await IsValidUser(login);
@@ -43,7 +49,7 @@ namespace GenshinFarm.Api.Controllers
                 var token = TokenGenerator(validation.Item2);
                 return Ok(new { token });
             }
-            return NotFound();
+            return NotFound(login);
         }
         /// <summary>
         /// Refresh the JWT.
@@ -52,6 +58,8 @@ namespace GenshinFarm.Api.Controllers
         /// <returns></returns>
         [HttpGet]
         [Authorize]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(string))]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<ActionResult> Refresh(string username)
         {
             User user = await _userService.GetLoginByCredentials(new UserLogin { Username = username });
@@ -80,6 +88,8 @@ namespace GenshinFarm.Api.Controllers
             //Claims
             var claims = new[]
             {
+                new Claim("UserId", user.Id),
+                new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.Name, user.Username),
                 new Claim(ClaimTypes.Role, user.Role.ToString())
             };
