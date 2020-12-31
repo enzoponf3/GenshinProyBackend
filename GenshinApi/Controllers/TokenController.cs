@@ -74,6 +74,7 @@ namespace GenshinFarm.Api.Controllers
         private async Task<(bool, User)> IsValidUser(UserLogin login)
         {
             User user = await _userService.GetLoginByCredentials(login);
+            if(user == null) { return (false, user); }
             var isValid = _passwordService.Check(user.Password, user.Salt, login.Password);
             return (isValid, user);
         }
