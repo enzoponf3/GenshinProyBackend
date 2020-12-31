@@ -41,15 +41,24 @@ namespace GenshinFarm.Api.Controllers
         [HttpPost]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest, Type = typeof(UserLogin))]
+        [ProducesResponseType((int)HttpStatusCode.NotFound, Type = typeof(UserLogin))]
         public async Task<IActionResult> Authentication(UserLogin login)
         {
-            var validation = await IsValidUser(login);
-            if (validation.Item1)
+            try
             {
-                var token = TokenGenerator(validation.Item2);
-                return Ok(new { token });
+                var validation = await IsValidUser(login);
+                if (validation.Item1)
+                {
+                    var token = TokenGenerator(validation.Item2);
+                    return Ok(new { token });
+                }
+                return BadRequest(login);
             }
-            return NotFound(login);
+            catch(Exception e) 
+            {
+                return NotFound(login);
+            }
+            
         }
         /// <summary>
         /// Refresh the JWT.
@@ -74,7 +83,7 @@ namespace GenshinFarm.Api.Controllers
         private async Task<(bool, User)> IsValidUser(UserLogin login)
         {
             User user = await _userService.GetLoginByCredentials(login);
-            if(user == null) { return (false, user); }
+            if(user == null) { throw new ArgumentException(); }
             var isValid = _passwordService.Check(user.Password, user.Salt, login.Password);
             return (isValid, user);
         }
