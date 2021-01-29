@@ -41,7 +41,7 @@ namespace GenshinFarm.Api.Controllers
             return Ok(charDtos);
         }
         /// <summary>
-        /// Retrieve the Character spicified by the id.
+        /// Retrieve the Character specified by the id.
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -58,6 +58,11 @@ namespace GenshinFarm.Api.Controllers
             return Ok(charDto);
         }
 
+        /// <summary>
+        /// Update a Character.
+        /// </summary>
+        /// <param name="Character"></param>
+        /// <returns></returns>
         [HttpPut]
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(CharacterDto))]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]

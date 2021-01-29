@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using GenshinFarm.Core.DTOs;
+using GenshinFarm.Core.Entities;
 using GenshinFarm.Core.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 namespace GenshinFarm.Api.Controllers
 {
     [Produces("application/json")]
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [EnableCors("AllowOrigin")]
     [ApiController]
     public class FarmLocationController : ControllerBase
@@ -39,7 +40,7 @@ namespace GenshinFarm.Api.Controllers
             return Ok(weaponDtos);
         }
         /// <summary>
-        /// Retrieve the Farm Location spicified by the id.
+        /// Retrieve the Farm Location specified by the id.
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -48,12 +49,30 @@ namespace GenshinFarm.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(IEnumerable<FarmLocationDto>))]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [Authorize]
-        public async Task<ActionResult> FarmLocations(string id)
+        public async Task<ActionResult> FarmLocation(string id)
         {
             var farmLocation = await _unitOfWork.FarmLocationRepository.GetById(id);
-            if (farmLocation == null) { return BadRequest($"There is not Farm Location with the id: {id}."); }
-            var farmLocationDtos = _mapper.Map<FarmLocationDto>(farmLocation);
-            return Ok(farmLocationDtos);
+            if (farmLocation == null) { return BadRequest($"There is not Location with the id: {id}."); }
+            var farmLocationDto = _mapper.Map<FarmLocationDto>(farmLocation);
+            return Ok(farmLocationDto);
+        }
+
+        /// <summary>
+        /// Update a Location.
+        /// </summary>
+        /// <param name="Location"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(FarmLocationDto))]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [Authorize(Roles = "Administrator")]
+        public async Task<ActionResult> Update(FarmLocationDto locationDto)
+        {
+            if(await _unitOfWork.FarmLocationRepository.GetById(locationDto.Id) == null) { return BadRequest($"There is not Location with the id: {locationDto.Id}."); }
+            var location = _mapper.Map<FarmLocation>(locationDto);
+            _unitOfWork.FarmLocationRepository.Update(location);
+            await _unitOfWork.SaveChangesAsync();
+            return Ok(locationDto);
         }
     }
 }

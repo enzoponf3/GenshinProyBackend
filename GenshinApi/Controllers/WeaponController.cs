@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using GenshinFarm.Core.DTOs;
+using GenshinFarm.Core.Entities;
 using GenshinFarm.Core.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
@@ -10,7 +12,7 @@ using System.Threading.Tasks;
 namespace GenshinFarm.Api.Controllers
 {
     [Produces("application/json")]
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [EnableCors("AllowOrigin")]
     [ApiController]
     public class WeaponController : ControllerBase
@@ -37,7 +39,7 @@ namespace GenshinFarm.Api.Controllers
             return Ok(weaponDtos);
         }
         /// <summary>
-        /// Retrieve the Weapon spicified by the id.
+        /// Retrieve the Weapon specified by the id.
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -45,12 +47,30 @@ namespace GenshinFarm.Api.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(IEnumerable<WeaponDto>))]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public async Task<ActionResult> Weapons(string id)
+        public async Task<ActionResult> Weapon(string id)
         {
             var weapon = await _unitOfWork.WeaponRepository.GetById(id);
             if (weapon == null) { return BadRequest($"There is not Weapon with the id: {id}."); }
             var weaponDtos = _mapper.Map<WeaponDto>(weapon);
             return Ok(weaponDtos);
+        }
+
+        /// <summary>
+        /// Update a Weapon.
+        /// </summary>
+        /// <param name="Weapon"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(WeaponDto))]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [Authorize(Roles = "Administrator")]
+        public async Task<ActionResult> Update(WeaponDto weaponDto)
+        {
+            if(await _unitOfWork.WeaponRepository.GetById(weaponDto.Id) == null) { return BadRequest($"There is not Weapon with the id: {weaponDto.Id}"); }
+            var weapon = _mapper.Map<Weapon>(weaponDto);
+            _unitOfWork.WeaponRepository.Update(weapon);
+            await _unitOfWork.SaveChangesAsync();
+            return Ok(weaponDto);
         }
     }
 }

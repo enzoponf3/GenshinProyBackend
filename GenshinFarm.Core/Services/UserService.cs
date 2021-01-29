@@ -45,9 +45,20 @@ namespace GenshinFarm.Core.Services
             await _unitOfWork.SaveChangesAsync();            
         }
 
-        public Task AddElements(string userId, ICollection<UserElement> userElements)
+        public async Task AddElements(string userId, ICollection<UserElement> userElements)
         {
-            throw new NotImplementedException();
+            User user = await _unitOfWork.UserRepository.GetById(userId);
+
+            if (user == null) { throw new ArgumentException("The user doesn't exists."); }
+            foreach(UserElement elem in userElements)
+            {
+                var existingElement = user.UserElement.FirstOrDefault(e => e.ElementId == elem.ElementId);
+                if (existingElement != null) { throw new ArgumentException("The user already had the element."); }
+                user.UserElement.Add(elem);
+                _unitOfWork.UserRepository.Update(user);
+
+            }
+            await _unitOfWork.SaveChangesAsync();
         }
 
         public async Task<bool> Delete(string id)

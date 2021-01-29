@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace GenshinFarm.Api.Controllers
 {
     [Produces("application/json")]
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [EnableCors("AllowOrigin")]
     [ApiController]
     public class MaterialController : Controller
@@ -40,7 +40,7 @@ namespace GenshinFarm.Api.Controllers
             return Ok(charDtos);
         }
         /// <summary>
-        /// Retrieve the Material spicified by the id.
+        /// Retrieve the Material specified by the id.
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -49,7 +49,7 @@ namespace GenshinFarm.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(IEnumerable<MaterialDto>))]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [Authorize]
-        public async Task<ActionResult> Materials(string id)
+        public async Task<ActionResult> Material(string id)
         {
             var material = await _unitOfWork.MaterialRepository.GetById(id);
             if (material == null) { return BadRequest(($"There is not Material with the id: {id}.")); }
@@ -57,20 +57,44 @@ namespace GenshinFarm.Api.Controllers
             return Ok(materialDto);
         }
 
-        [HttpPost]
-        [ProducesResponseType((int)HttpStatusCode.OK)]
-        [Authorize]
+        /// <summary>
+        /// Updates a Material.
+        /// </summary>
+        /// <param name="Material"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(MaterialDto))]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [Authorize(Roles = "Administrator")]
+        public async Task<ActionResult> Update(MaterialDto materialDto)
+        {
+            if(await _unitOfWork.MaterialRepository.GetById(materialDto.Id) == null) { return BadRequest($"There is not Material with the id: {materialDto.Id}"); }
+            var material = _mapper.Map<Material>(materialDto);
+            _unitOfWork.MaterialRepository.Update(material);
+            await _unitOfWork.SaveChangesAsync();
+            return Ok(materialDto);
+        }
+
+        /// <summary>
+        /// Update multiple elements.
+        /// </summary>
+        /// <param name="Materials"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(IEnumerable<MaterialDto>))]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [Authorize(Roles = "Administrator")]
         public async Task<ActionResult> UpdateMultiple(IEnumerable<MaterialDto> materialsDtos)
         {
 
             IEnumerable<Material> materials = _mapper.Map<IEnumerable<Material>>(materialsDtos);
             foreach (var mat in materials) 
             {
+                if(await _unitOfWork.MaterialRepository.GetById(mat.Id) == null) { return BadRequest($"There is not Material with the id: {mat.Id}."); }
                 _unitOfWork.MaterialRepository.Update(mat);
-                await _unitOfWork.SaveChangesAsync();
             }
-
-            return Ok();
+            await _unitOfWork.SaveChangesAsync();
+            return Ok(materialsDtos);
 
         }
 

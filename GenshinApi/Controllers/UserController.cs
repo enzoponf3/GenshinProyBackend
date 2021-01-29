@@ -44,7 +44,7 @@ namespace GenshinFarm.Api.Controllers
             return Ok(userDtos);
         }
         /// <summary>
-        /// Retrieve the User spicified by the id.
+        /// Retrieve the User specified by the id.
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -125,7 +125,7 @@ namespace GenshinFarm.Api.Controllers
         [HttpDelete("{id}")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [Authorize]
+        [Authorize(Roles = "Administrator")]
         public async Task<ActionResult> Delete(string id)
         {
             if(await _userService.Delete(id)) { return BadRequest("User doesn't exists."); }
@@ -163,27 +163,27 @@ namespace GenshinFarm.Api.Controllers
         /// <param name="userElementsDto"></param>
         /// <returns></returns>
         [HttpPost("{id}")]
-        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(IEnumerable<UserElementDto>))]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [Authorize]
         public async Task<ActionResult> AddElements(string id, ICollection<UserElementDto> userElementsDto)
         {
 
-            ICollection<UserElement> userElement = _mapper.Map<ICollection<UserElement>>(userElementsDto);
-            foreach(UserElement elem in userElement)
+            ICollection<UserElement> userElements = _mapper.Map<ICollection<UserElement>>(userElementsDto);
+            foreach(UserElement elem in userElements)
             {
                 elem.Id = Guid.NewGuid().ToString();
                 elem.setPowerLvl();
             };
             try
             {
-                await _userService.AddElements(id, userElement);
+                await _userService.AddElements(id, userElements);
             }
             catch (Exception e)
             {
                 return BadRequest(e.Message);
             }
-            return Ok();
+            return Ok(userElementsDto);
         }
     }
 }

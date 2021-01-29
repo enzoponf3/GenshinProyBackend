@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using GenshinFarm.Core.DTOs;
+using GenshinFarm.Core.Entities;
 using GenshinFarm.Core.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 namespace GenshinFarm.Api.Controllers
 {
     [Produces("application/json")]
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [EnableCors("AllowOrigin")]
     [ApiController]
     public class TalentController : ControllerBase
@@ -39,21 +40,39 @@ namespace GenshinFarm.Api.Controllers
             return Ok(talentDtos);
         }
         /// <summary>
-        /// Retrieve the Talent spicified by the id.
+        /// Retrieve the Talent specified by the id.
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
 
         [HttpGet("{id}")]
-        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(IEnumerable<WeaponDto>))]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(IEnumerable<TalentDto>))]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [Authorize]
-        public async Task<ActionResult> Talents(string id)
+        public async Task<ActionResult> Talent(string id)
         {
             var talent = await _unitOfWork.TalentRepository.GetById(id);
             if (talent == null) { return BadRequest($"There is not Talent with the id: {id}."); }
             var talentDtos = _mapper.Map<TalentDto>(talent);
             return Ok(talentDtos);
+        }
+
+        /// <summary>
+        /// Update a Talent.
+        /// </summary>
+        /// <param name="Talent"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [ProducesResponseType ((int) HttpStatusCode.OK, Type = typeof(TalentDto))]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [Authorize(Roles = "Administrator")]
+        public async Task<ActionResult> Update (TalentDto talentDto)
+        {
+            if (await _unitOfWork.TalentRepository.GetById(talentDto.Id) == null) { return BadRequest($"There is not Talent with the id: {talentDto.Id}."); }
+            var talent = _mapper.Map<Talent>(talentDto);
+            _unitOfWork.TalentRepository.Update(talent);
+            await _unitOfWork.SaveChangesAsync();
+            return Ok(talentDto);
         }
     }
 }
