@@ -32,7 +32,7 @@ namespace GenshinApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-            services.AddDbContext<GenshinDbContext>(options => options.UseSqlServer(Configuration["ConnectionString"], b => b.MigrationsAssembly("GenshinFarm.Api")));
+            services.AddEntityFrameworkNpgsql().AddDbContext<GenshinDbContext>(options => options.UseNpgsql(Configuration["PostgreConnectionString"], b => b.MigrationsAssembly("GenshinFarm.Api")));            
             //new DbPlanter(services);
             services.Configure<PasswordOptions>(options => Configuration.GetSection("PasswordOptions").Bind(options));
             services.AddTransient<IUnitOfWork, UnitOfWork>();
