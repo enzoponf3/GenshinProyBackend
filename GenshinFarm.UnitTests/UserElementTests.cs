@@ -33,7 +33,7 @@ namespace GenshinFarm.UnitTests
         [Test]
         public void Test1PowerSettedByLvl(int lvl, int power)
         {
-            UserElement uElement = new UserElement(lvl);
+            CharacterWeapon uElement = new CharacterWeapon(lvl);
             Assert.That(power, Is.EqualTo(uElement.PowerLvl));
         }
 
@@ -44,7 +44,7 @@ namespace GenshinFarm.UnitTests
         [Test]
         public void Test2UserElementOutOfRangeException(int lvl, Type ex = null)
         {
-            Assert.Throws(ex, ()=> new UserElement(lvl) );
+            Assert.Throws(ex, ()=> new CharacterWeapon(lvl) );
         }
 
 
@@ -65,13 +65,13 @@ namespace GenshinFarm.UnitTests
             };
             var config = new MapperConfiguration(c =>
             {
-                c.CreateMap<UserElement, UserElementDto>().ReverseMap();
+                c.CreateMap<CharacterWeapon, UserElementDto>().ReverseMap();
             });
             config.AssertConfigurationIsValid();
             IMapper mapper = config.CreateMapper();
             try
             {
-                UserElement uElement = mapper.Map<UserElement>(dElement);
+                CharacterWeapon uElement = mapper.Map<CharacterWeapon>(dElement);
                 uElement.setPowerLvl();
                 Assert.That(power, Is.EqualTo(uElement.PowerLvl));
             }catch(Exception e)

@@ -16,6 +16,7 @@ namespace GenshinFarm.Core.Entities
         public virtual ICollection<FarmLocation> FarmLocation { get; set; }
         public virtual ICollection<Character> Characters { get; set; }
         public virtual ICollection<DaysOfWeek> DaysAvailable { get; set; }
+        public virtual ICollection<AscensionCategory> AscensionCategories { get; set; }
     }
     public class AscMaterial : Material
     {

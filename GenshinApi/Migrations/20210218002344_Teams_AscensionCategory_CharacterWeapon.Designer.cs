@@ -3,15 +3,17 @@ using System;
 using GenshinFarm.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace GenshinFarm.Api.Migrations
 {
     [DbContext(typeof(GenshinDbContext))]
-    partial class GenshinDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210218002344_Teams_AscensionCategory_CharacterWeapon")]
+    partial class Teams_AscensionCategory_CharacterWeapon
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

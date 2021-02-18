@@ -8,6 +8,5 @@
         public string Rarity { get; set; }
         public string Type { get; set; }
         public int Attack { get; set; }
-        public int PowerLvl { get; set; }
     }
 }

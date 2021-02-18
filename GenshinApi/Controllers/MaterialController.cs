@@ -1,11 +1,14 @@
 ﻿using AutoMapper;
 using GenshinFarm.Core.DTOs;
 using GenshinFarm.Core.Entities;
+using GenshinFarm.Core.Enumerations;
 using GenshinFarm.Core.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -97,6 +100,21 @@ namespace GenshinFarm.Api.Controllers
             return Ok(materialsDtos);
 
         }
-
+        [HttpGet]
+        [Authorize]
+        public async Task<ActionResult> GetMaterials(CharacterWeapon characterWeapon)
+        {
+            ICollection<Material> cMaterials = characterWeapon.Character.TalentMaterials;
+            ICollection<Material> wMaterials = characterWeapon.Weapon.Materials;
+            AscensionCategory ascensionCategory = await _unitOfWork.AscensionCategoryRepository.GetByLvl(characterWeapon.PowerLvl);
+            IEnumerable<Material> characterMaterials = cMaterials.Where(m => m.AscensionCategories.Contains(ascensionCategory));
+            IEnumerable<Material> weaponMaterials = wMaterials.Where(m => m.AscensionCategories.Contains(ascensionCategory));
+            MaterialsDto materialsDto = new MaterialsDto()
+            {
+                CharacterMaterials = characterMaterials,
+                WeaponMaterials = weaponMaterials
+            };
+            return Ok(materialsDto);
+        }
     }
 }

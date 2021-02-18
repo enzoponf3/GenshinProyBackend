@@ -31,7 +31,7 @@ namespace GenshinFarm.Infrastructure.Repositories
             return _entities.AsEnumerable();
         }
 
-        public async Task<T> GetById(string id)
+        public virtual async Task<T> GetById(string id)
         {
             return await _entities.FindAsync(id);
         }

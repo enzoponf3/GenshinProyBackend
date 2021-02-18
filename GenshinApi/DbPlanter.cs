@@ -31,6 +31,7 @@ namespace GenshinApi
                 //this.AddMaterials();
                 //this.dayMaterial();
                 //this.locationMaterial();
+                this.AddAscensionCategory();
                 var characters = _context.Characters
                                         .Include(c => c.AscensionMaterials)
                                         .Include(c => c.TalentMaterials)
@@ -51,6 +52,23 @@ namespace GenshinApi
 
             }
         }
+        private void AddAscensionCategory()
+        {
+            List<AscensionCategory> ascensionCategories = new List<AscensionCategory>()
+            {
+                new AscensionCategory(){ Category = 0},
+                new AscensionCategory(){ Category = 1},
+                new AscensionCategory(){ Category = 2},
+                new AscensionCategory(){ Category = 3},
+                new AscensionCategory(){ Category = 4},
+                new AscensionCategory(){ Category = 5},
+                new AscensionCategory(){ Category = 6}
+            };
+            _context.AscensionCategories.AddRange(ascensionCategories);
+            _context.SaveChanges();
+            return;
+        }
+
         public void AddDays()
         {
             if(_context.DaysOfWeeks.Count<DaysOfWeek>() == 0) 
@@ -83,7 +101,6 @@ namespace GenshinApi
                         Id = c[0],
                         Name = c[1],
                         Slug = c[2],
-                        PowerLvl = Int32.Parse(c[3]),
                         Rarity = (Rarity)Enum.Parse(typeof(Rarity), c[4]),
                         Type = (ElementalType)Enum.Parse(typeof(ElementalType), c[5]),
                         WeaponType = (WeaponType)Enum.Parse(typeof(WeaponType), c[6])
@@ -114,7 +131,6 @@ namespace GenshinApi
                         Rarity = (Rarity)Enum.Parse(typeof(Rarity), c[3]),
                         Type = (WeaponType)Enum.Parse(typeof(WeaponType), c[4]),
                         Attack = Int32.Parse(c[5]),
-                        PowerLvl = Int32.Parse(c[6]),
                         Desciption = c[7]
                     };
                     weapons.Add(weapon);

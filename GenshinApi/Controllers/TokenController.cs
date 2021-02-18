@@ -91,7 +91,7 @@ namespace GenshinFarm.Api.Controllers
         private string TokenGenerator(User user)
         {
             //Header
-            var symetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["SecretKey"]));
+            var symetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Authentication:SecretKey"]));
             var singingCredentials = new SigningCredentials(symetricSecurityKey, SecurityAlgorithms.HmacSha256);
             var header = new JwtHeader(singingCredentials);
 

@@ -14,6 +14,9 @@ namespace GenshinFarm.Core.Interfaces
         IRepository<Talent> TalentRepository { get; }
         IRepository<FarmLocation> FarmLocationRepository { get; }
         IUserRepository UserRepository { get; }
+        IRepository<Team> TeamRepository { get; }
+        IRepository<CharacterWeapon> CharacterWeaponRepository { get; }
+        IAscensionRespository AscensionCategoryRepository { get; }
         Task SaveChangesAsync();
     }
 }

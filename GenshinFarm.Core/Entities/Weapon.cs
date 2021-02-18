@@ -15,8 +15,8 @@ namespace GenshinFarm.Core.Entities
         public Rarity Rarity { get; set; }
         public WeaponType Type { get; set; }
         public int Attack { get; set; }
-        public int PowerLvl { get; set; }
         public string Desciption { get; set; }
-        public virtual ICollection<User> User { get; set; }
+        public virtual ICollection<Material> Materials { get; set; }
+        public virtual ICollection<CharacterWeapon> CharacterWeapon { get; set; }
     }
 }
