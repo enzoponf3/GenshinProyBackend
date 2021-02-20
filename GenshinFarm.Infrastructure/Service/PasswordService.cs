@@ -32,7 +32,7 @@ namespace GenshinFarm.Infrastructure.Service
             {
                 var keyToChek = algorithm.GetBytes(_passwordOptions.KeySize);
 
-                return keyToChek.SequenceEqual(_key);
+                return _key.SequenceEqual(keyToChek);
             }
         }
 

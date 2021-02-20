@@ -3,7 +3,6 @@ using GenshinFarm.Core.Enumerations;
 using GenshinFarm.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -24,12 +23,19 @@ namespace GenshinApi
             {
                 _context = scope.ServiceProvider.GetService<GenshinDbContext>();
 
+                //this.AddDays();
                 //this.AddCharacters();
                 //this.AddFarmLocations();
                 //this.AddWeapons();
-                //this.AddDays();
                 //this.AddTalents();
                 //this.AddMaterials();
+                //this.dayMaterial();
+                //this.locationMaterial();
+                this.AddAscensionCategory();
+                var characters = _context.Characters
+                                        .Include(c => c.AscensionMaterials)
+                                        .Include(c => c.TalentMaterials)
+                                        .OrderBy(c => c.Name);
                 var materials = _context.Materials
                                          .Include(m => m.DaysAvailable)
                                          .Include(a => a.FarmLocation)
@@ -46,134 +52,200 @@ namespace GenshinApi
 
             }
         }
+        private void AddAscensionCategory()
+        {
+            List<AscensionCategory> ascensionCategories = new List<AscensionCategory>()
+            {
+                new AscensionCategory(){ Category = 0},
+                new AscensionCategory(){ Category = 1},
+                new AscensionCategory(){ Category = 2},
+                new AscensionCategory(){ Category = 3},
+                new AscensionCategory(){ Category = 4},
+                new AscensionCategory(){ Category = 5},
+                new AscensionCategory(){ Category = 6}
+            };
+            _context.AscensionCategories.AddRange(ascensionCategories);
+            _context.SaveChanges();
+            return;
+        }
+
         public void AddDays()
         {
-            List<DaysOfWeek> days = new List<DaysOfWeek>()
+            if(_context.DaysOfWeeks.Count<DaysOfWeek>() == 0) 
             {
-                new DaysOfWeek {Id= Guid.NewGuid().ToString(), Name="Moday"},
-                new DaysOfWeek {Id= Guid.NewGuid().ToString(),Name="Tuesday"},
-                new DaysOfWeek {Id= Guid.NewGuid().ToString(),Name="Wednesday"},
-                new DaysOfWeek {Id= Guid.NewGuid().ToString(),Name="Thursday"},
-                new DaysOfWeek {Id= Guid.NewGuid().ToString(),Name="Friday"},
-                new DaysOfWeek {Id= Guid.NewGuid().ToString(),Name="Saturday"},
-                new DaysOfWeek {Id= Guid.NewGuid().ToString(),Name="Sunday"}
-            };
-            _context.DaysOfWeeks.AddRange(days);
-            _context.SaveChanges();
+                var arr = GetLines("csvBackup/daysOfWeek.csv");
+                List<DaysOfWeek> days = new List<DaysOfWeek> ();
+
+                foreach(var day in arr)
+                {
+                    days.Add(new DaysOfWeek { Id = day[0], Name = day[1] });
+                }
+
+                _context.DaysOfWeeks.AddRange(days);
+                _context.SaveChanges();
+            }
         }
 
         public void AddCharacters()
         {
-            StreamReader  r = new StreamReader("TempDataFiles/characters.json");
-            string json = r.ReadToEnd();
-
-            dynamic array = JsonConvert.DeserializeObject(json);
-
-            List<Character> characters = new List<Character>();
-
-            foreach( var c in array)
+            if (_context.Characters.Count<Character>() == 0)
             {
-                Character character = new Character
+                var arr = GetLines("csvBackup/characters.csv");
+                List<Character> chars = new List<Character>();
+
+                foreach (var c in arr)
                 {
-                    Id = Guid.NewGuid().ToString(),
-                    Name = c.name,
-                    Slug = c.slug,
-                    Rarity = c.rarity,
-                    WeaponType = c.weapon,
-                    Type = c.vision,
-                    PowerLvl = 0
-                };
-                characters.Add(character);
+                    //Id;Name;Slug;PowerLvl;Rarity;Type;WeaponType
+                    Character character = new Character
+                    {
+                        Id = c[0],
+                        Name = c[1],
+                        Slug = c[2],
+                        Rarity = (Rarity)Enum.Parse(typeof(Rarity), c[4]),
+                        Type = (ElementalType)Enum.Parse(typeof(ElementalType), c[5]),
+                        WeaponType = (WeaponType)Enum.Parse(typeof(WeaponType), c[6])
+                    };
+                    chars.Add(character);
+                }
+
+                _context.Characters.AddRange(chars);
+                _context.SaveChanges();
             }
-            _context.Characters.AddRange(characters);
-            _context.SaveChanges();
         }
 
         public void AddWeapons()
         {
-            StreamReader r = new StreamReader("TempDataFiles/weapons.json");
-            string json = r.ReadToEnd();
-            dynamic array = JsonConvert.DeserializeObject(json);
-            List<Weapon> weapons = new List<Weapon>();
-            foreach(var w in array)
+            if (_context.Weapons.Count<Weapon>() == 0)
             {
-                Weapon weapon = new Weapon
+                var arr = GetLines("csvBackup/weapons.csv");
+                List<Weapon> weapons = new List<Weapon>();
+
+                foreach (var c in arr)
                 {
-                    Id = Guid.NewGuid().ToString(),
-                    Name = w.name,
-                    Slug = w.slug,
-                    Rarity = w.rarity,
-                    Attack = w.atk,
-                    Type = w.type,
-                    PowerLvl = 0
-                };
-                weapons.Add(weapon);
+                    //Id;Name;Slug;Rarity;Type;Attack;PowerLvl;Desciption
+                    Weapon weapon = new Weapon
+                    {
+                        Id = c[0],
+                        Name = c[1],
+                        Slug = c[2],
+                        Rarity = (Rarity)Enum.Parse(typeof(Rarity), c[3]),
+                        Type = (WeaponType)Enum.Parse(typeof(WeaponType), c[4]),
+                        Attack = Int32.Parse(c[5]),
+                        Desciption = c[7]
+                    };
+                    weapons.Add(weapon);
+                }
+
+                _context.Weapons.AddRange(weapons);
+                _context.SaveChanges();
             }
-            _context.Weapons.AddRange(weapons);
-            _context.SaveChanges();
         }
 
         public void AddFarmLocations()
         {
-            var objs = GetLines("TempDataFiles/farm_places.csv");
-            List<FarmLocation> locations = new List<FarmLocation>();
-            foreach( var place in objs)
+            if (_context.FarmLocations.Count<FarmLocation>() == 0)
             {
+                var arr = GetLines("csvBackup/farmLocations.csv");
+                List<FarmLocation> locations = new List<FarmLocation>();
 
-                FarmLocation location = new FarmLocation
+                foreach (var c in arr)
                 {
-                    Id = Guid.NewGuid().ToString(),
-                    Name = place[0],
-                    Slug = place[1],
-                    Weekly = place[2] == "True" ? true : false
-                };
-                locations.Add(location);
+                    //Id;Name;Slug;Weekly
+                    FarmLocation location = new FarmLocation
+                    {
+                        Id = c[0],
+                        Name = c[1],
+                        Slug = c[2],
+                        Weekly = Convert.ToBoolean(Int32.Parse(c[3]))
+                    };
+                    locations.Add(location);
+                }
+
+                _context.FarmLocations.AddRange(locations);
+                _context.SaveChanges();
             }
-            _context.FarmLocations.AddRange(locations);
-            _context.SaveChanges();
         }
         public void AddTalents()
         {
-            var lines = GetLines("TempDataFiles/talents.csv");
-            List<Talent> talents = new List<Talent>();
-            foreach( var t in lines)
+            if (_context.Talents.Count<Talent>() == 0)
             {
-                Talent talent = new Talent
+                var arr = GetLines("csvBackup/talents.csv");
+                List<Talent> talents = new List<Talent>();
+
+                foreach (var c in arr)
                 {
-                    Id = Guid.NewGuid().ToString(),
-                    Character = _context.Characters.FirstOrDefault(x => x.Slug == t[0]),
-                    Name = t[1],
-                    Slug = t[2]
-                };
-                talents.Add(talent);
+                    //Id;Name;Slug;Level;PowerLvl;CharacterId
+                    Talent talent = new Talent
+                    {
+                        Id = c[0],
+                        Name = c[1],
+                        Slug = c[2],
+                        Level = Int32.Parse(c[3]),
+                        PowerLvl = Int32.Parse(c[4]),
+                        Character = _context.Characters.FirstOrDefault( d => d.Id == c[5])
+                    };
+                    talents.Add(talent);
+                }
+
+                _context.Talents.AddRange(talents);
+                _context.SaveChanges();
             }
-            _context.Talents.AddRange(talents);
-            _context.SaveChanges();
         }
 
         public void AddMaterials()
         {
-            var lines = GetLines("TempDataFiles/materials-cambiado.csv");
-            List<Material> materials = new List<Material>();
-            foreach(var m in lines)
+            if (_context.Materials.Count<Material>() == 0)
             {
-                Material material = new Material() 
+                var arr = GetLines("csvBackup/materials.csv");
+                List<Material> materials = new List<Material>();
+
+                foreach (var c in arr)
                 {
-                    Id = Guid.NewGuid().ToString(),
-                    Name = m[0],
-                    Slug = m[1],
-                };
-                var farmLocation = (_context.FarmLocations.FirstOrDefault(x => x.Name == m[5]) ?? _context.FarmLocations.FirstOrDefault(x => x.Slug == m[5]));
-                farmLocation.Materials.Add(material);
-                materials.Add(material);
-                if (m[2] != "None")
-                {
-                    _context.DaysOfWeeks.FirstOrDefault(x => x.Name == m[2]).Materials.Add(material);
-                    _context.DaysOfWeeks.FirstOrDefault(x => x.Name == m[3]).Materials.Add(material);
-                    _context.DaysOfWeeks.FirstOrDefault(x => x.Name == m[4]).Materials.Add(material);
+                    //Id;Name;Slug;Discriminator;CharacterId;Rarity
+                    Material material = new Material
+                    {
+                        Id = c[0],
+                        Name = c[1],
+                        Slug = c[2],
+                        Rarity = (Rarity) Enum.Parse(typeof(Rarity), c[5])
+                    };
+                    materials.Add(material);
                 }
+
+                _context.Materials.AddRange(materials);
+                _context.SaveChanges();
             }
-            _context.Materials.AddRange(materials);
+        }
+
+        public void dayMaterial()
+        {
+            var arr = GetLines("csvBackup/daysMaterial.csv");
+
+            foreach (var c in arr)
+            {
+                //DaysAvailableId;MaterialsId
+                DaysOfWeek day = _context.DaysOfWeeks.FirstOrDefault(d => d.Id == c[0]);
+                Material material = _context.Materials.FirstOrDefault(m => m.Id == c[1]);
+                day.Materials.Add(material);
+                _context.DaysOfWeeks.Update(day);
+            }
+
+            _context.SaveChanges();
+        }
+
+        public void locationMaterial()
+        {
+            var arr = GetLines("csvBackup/locationMaterial.csv");
+
+            foreach (var c in arr)
+            {
+                //FarmLocationId; MaterialsId
+                FarmLocation location = _context.FarmLocations.FirstOrDefault(d => d.Id == c[0]);
+                Material material = _context.Materials.FirstOrDefault(m => m.Id == c[1]);
+                location.Materials.Add(material);
+                _context.FarmLocations.Update(location);
+            }
+
             _context.SaveChanges();
         }
 
@@ -181,9 +253,9 @@ namespace GenshinApi
         {
             var text = File.ReadAllText(file);
             List<string[]> lines = new List<string[]>(); 
-            foreach(var obj in text.Split("\n"))
+            foreach(var obj in text.Split("\r\n"))
             {
-                lines.Add(obj.Split(","));
+                lines.Add(obj.Split(";"));
             }
             return lines;
 

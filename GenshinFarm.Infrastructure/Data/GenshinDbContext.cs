@@ -16,8 +16,10 @@ namespace GenshinFarm.Infrastructure.Data
         public virtual DbSet<Talent> Talents { get; set; }
         public virtual DbSet<FarmLocation> FarmLocations { get; set; }
         public virtual DbSet<DaysOfWeek> DaysOfWeeks { get; set; }
-        public virtual DbSet<UserElement> UserElement { get; set; }
+        public virtual DbSet<Team> Teams { get; set; }
+        public virtual DbSet<CharacterWeapon> CharacterWeapons { get; set; }
         public virtual DbSet<User> Users { get; set; }
+        public virtual DbSet<AscensionCategory> AscensionCategories { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());

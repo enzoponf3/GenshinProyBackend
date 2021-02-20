@@ -8,10 +8,8 @@ namespace GenshinFarm.Core.Entities
     {
         public User()
         {
-            this.Id = Guid.NewGuid().ToString();
-            this.Characters = new HashSet<Character>();
-            this.Weapons = new HashSet<Weapon>();
-            this.UserElement = new HashSet<UserElement>();
+            this.Id = Guid.NewGuid().ToString();    
+            this.Teams = new HashSet<Team>();
         }
         public string Username { get; set; }
         public string Email { get; set; }
@@ -19,8 +17,7 @@ namespace GenshinFarm.Core.Entities
         public string Salt { get; set; }
         public RoleType Role { get; set; }
         public DateTime LastTimeLoged { get; set; }
-        public virtual ICollection<Character> Characters { get; set; }
-        public virtual ICollection<Weapon> Weapons { get; set; }
-        public virtual ICollection<UserElement> UserElement { get; set; }
+        public virtual ICollection<Team> Teams { get; set; }
+        public virtual ICollection<CharacterWeapon> CharacterWeapons { get; set; }
     }
 }

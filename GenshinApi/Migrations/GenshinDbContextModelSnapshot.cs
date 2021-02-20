@@ -3,8 +3,8 @@ using System;
 using GenshinFarm.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace GenshinFarm.Api.Migrations
 {
@@ -15,17 +15,32 @@ namespace GenshinFarm.Api.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .UseIdentityColumns()
-                .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("ProductVersion", "5.0.0");
+                .UseIdentityByDefaultColumns()
+                .HasAnnotation("Relational:MaxIdentifierLength", 63)
+                .HasAnnotation("ProductVersion", "5.0.2");
+
+            modelBuilder.Entity("AscensionCategoryMaterial", b =>
+                {
+                    b.Property<string>("AscensionCategoriesId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("MaterialsId")
+                        .HasColumnType("text");
+
+                    b.HasKey("AscensionCategoriesId", "MaterialsId");
+
+                    b.HasIndex("MaterialsId");
+
+                    b.ToTable("AscensionCategoryMaterial");
+                });
 
             modelBuilder.Entity("CharacterMaterial", b =>
                 {
                     b.Property<string>("CharactersId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.Property<string>("TalentMaterialsId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.HasKey("CharactersId", "TalentMaterialsId");
 
@@ -34,28 +49,28 @@ namespace GenshinFarm.Api.Migrations
                     b.ToTable("CharacterMaterial");
                 });
 
-            modelBuilder.Entity("CharacterUser", b =>
+            modelBuilder.Entity("CharacterWeaponTeam", b =>
                 {
-                    b.Property<string>("CharactersId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<string>("CharacterWeaponsId")
+                        .HasColumnType("text");
 
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<string>("TeamsId")
+                        .HasColumnType("text");
 
-                    b.HasKey("CharactersId", "UserId");
+                    b.HasKey("CharacterWeaponsId", "TeamsId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("TeamsId");
 
-                    b.ToTable("CharacterUser");
+                    b.ToTable("CharacterWeaponTeam");
                 });
 
             modelBuilder.Entity("DaysOfWeekMaterial", b =>
                 {
                     b.Property<string>("DaysAvailableId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.Property<string>("MaterialsId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.HasKey("DaysAvailableId", "MaterialsId");
 
@@ -67,10 +82,10 @@ namespace GenshinFarm.Api.Migrations
             modelBuilder.Entity("FarmLocationMaterial", b =>
                 {
                     b.Property<string>("FarmLocationId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.Property<string>("MaterialsId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.HasKey("FarmLocationId", "MaterialsId");
 
@@ -79,52 +94,96 @@ namespace GenshinFarm.Api.Migrations
                     b.ToTable("FarmLocationMaterial");
                 });
 
+            modelBuilder.Entity("GenshinFarm.Core.Entities.AscensionCategory", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<int>("Category")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AscensionCategories");
+                });
+
             modelBuilder.Entity("GenshinFarm.Core.Entities.Character", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.Property<int>("PowerLvl")
-                        .HasColumnType("int");
+                        .HasColumnType("character varying(150)");
 
                     b.Property<string>("Rarity")
                         .IsRequired()
                         .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
+                        .HasColumnType("character varying(30)");
 
                     b.Property<string>("Slug")
                         .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
+                        .HasColumnType("character varying(150)");
 
                     b.Property<string>("Type")
                         .IsRequired()
                         .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
+                        .HasColumnType("character varying(30)");
 
                     b.Property<string>("WeaponType")
                         .IsRequired()
                         .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
+                        .HasColumnType("character varying(30)");
 
                     b.HasKey("Id");
 
                     b.ToTable("Characters");
                 });
 
+            modelBuilder.Entity("GenshinFarm.Core.Entities.CharacterWeapon", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CharacterId")
+                        .HasColumnType("text");
+
+                    b.Property<int>("Lvl")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("PowerLvl")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("WeaponId")
+                        .HasColumnType("text");
+
+                    b.Property<int>("WeaponPowerLvl")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CharacterId");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("WeaponId");
+
+                    b.ToTable("CharacterWeapons");
+                });
+
             modelBuilder.Entity("GenshinFarm.Core.Entities.DaysOfWeek", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasColumnType("character varying(20)");
 
                     b.HasKey("Id");
 
@@ -134,20 +193,20 @@ namespace GenshinFarm.Api.Migrations
             modelBuilder.Entity("GenshinFarm.Core.Entities.FarmLocation", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
+                        .HasColumnType("character varying(150)");
 
                     b.Property<string>("Slug")
                         .IsRequired()
                         .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
+                        .HasColumnType("character varying(150)");
 
                     b.Property<bool>("Weekly")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.HasKey("Id");
 
@@ -157,26 +216,31 @@ namespace GenshinFarm.Api.Migrations
             modelBuilder.Entity("GenshinFarm.Core.Entities.Material", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Discriminator")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
+                        .HasColumnType("character varying(150)");
 
                     b.Property<string>("Rarity")
                         .IsRequired()
                         .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
+                        .HasColumnType("character varying(30)");
 
                     b.Property<string>("Slug")
                         .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<string>("WeaponId")
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("WeaponId");
 
                     b.ToTable("Materials");
 
@@ -186,26 +250,26 @@ namespace GenshinFarm.Api.Migrations
             modelBuilder.Entity("GenshinFarm.Core.Entities.Talent", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.Property<string>("CharacterId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.Property<int>("Level")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
+                        .HasColumnType("character varying(150)");
 
                     b.Property<int>("PowerLvl")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Slug")
                         .IsRequired()
                         .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
+                        .HasColumnType("character varying(150)");
 
                     b.HasKey("Id");
 
@@ -214,116 +278,94 @@ namespace GenshinFarm.Api.Migrations
                     b.ToTable("Talents");
                 });
 
+            modelBuilder.Entity("GenshinFarm.Core.Entities.Team", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CharacterId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CharacterId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Teams");
+                });
+
             modelBuilder.Entity("GenshinFarm.Core.Entities.User", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Email")
                         .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
+                        .HasColumnType("character varying(250)");
 
                     b.Property<DateTime>("LastTimeLoged")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Password")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Role")
                         .IsRequired()
                         .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
+                        .HasColumnType("character varying(30)");
 
                     b.Property<string>("Salt")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("character varying(256)");
 
                     b.Property<string>("Username")
                         .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
+                        .HasColumnType("character varying(150)");
 
                     b.HasKey("Id");
 
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("GenshinFarm.Core.Entities.UserElement", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("ElementId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Lvl")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PowerLvl")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserElement");
-                });
-
             modelBuilder.Entity("GenshinFarm.Core.Entities.Weapon", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.Property<int>("Attack")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Desciption")
                         .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("character varying(500)");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.Property<int>("PowerLvl")
-                        .HasColumnType("int");
+                        .HasColumnType("character varying(150)");
 
                     b.Property<string>("Rarity")
                         .IsRequired()
                         .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
+                        .HasColumnType("character varying(30)");
 
                     b.Property<string>("Slug")
                         .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
+                        .HasColumnType("character varying(150)");
 
                     b.Property<string>("Type")
                         .IsRequired()
                         .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
+                        .HasColumnType("character varying(30)");
 
                     b.HasKey("Id");
 
                     b.ToTable("Weapons");
-                });
-
-            modelBuilder.Entity("UserWeapon", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("WeaponsId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("UserId", "WeaponsId");
-
-                    b.HasIndex("WeaponsId");
-
-                    b.ToTable("UserWeapon");
                 });
 
             modelBuilder.Entity("GenshinFarm.Core.Entities.AscMaterial", b =>
@@ -331,11 +373,26 @@ namespace GenshinFarm.Api.Migrations
                     b.HasBaseType("GenshinFarm.Core.Entities.Material");
 
                     b.Property<string>("CharacterId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("text");
 
                     b.HasIndex("CharacterId");
 
                     b.HasDiscriminator().HasValue("AscMaterial");
+                });
+
+            modelBuilder.Entity("AscensionCategoryMaterial", b =>
+                {
+                    b.HasOne("GenshinFarm.Core.Entities.AscensionCategory", null)
+                        .WithMany()
+                        .HasForeignKey("AscensionCategoriesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GenshinFarm.Core.Entities.Material", null)
+                        .WithMany()
+                        .HasForeignKey("MaterialsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("CharacterMaterial", b =>
@@ -353,17 +410,17 @@ namespace GenshinFarm.Api.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("CharacterUser", b =>
+            modelBuilder.Entity("CharacterWeaponTeam", b =>
                 {
-                    b.HasOne("GenshinFarm.Core.Entities.Character", null)
+                    b.HasOne("GenshinFarm.Core.Entities.CharacterWeapon", null)
                         .WithMany()
-                        .HasForeignKey("CharactersId")
+                        .HasForeignKey("CharacterWeaponsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("GenshinFarm.Core.Entities.User", null)
+                    b.HasOne("GenshinFarm.Core.Entities.Team", null)
                         .WithMany()
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("TeamsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -398,6 +455,34 @@ namespace GenshinFarm.Api.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("GenshinFarm.Core.Entities.CharacterWeapon", b =>
+                {
+                    b.HasOne("GenshinFarm.Core.Entities.Character", "Character")
+                        .WithMany("CharacterWeapon")
+                        .HasForeignKey("CharacterId");
+
+                    b.HasOne("GenshinFarm.Core.Entities.User", "User")
+                        .WithMany("CharacterWeapons")
+                        .HasForeignKey("UserId");
+
+                    b.HasOne("GenshinFarm.Core.Entities.Weapon", "Weapon")
+                        .WithMany("CharacterWeapon")
+                        .HasForeignKey("WeaponId");
+
+                    b.Navigation("Character");
+
+                    b.Navigation("User");
+
+                    b.Navigation("Weapon");
+                });
+
+            modelBuilder.Entity("GenshinFarm.Core.Entities.Material", b =>
+                {
+                    b.HasOne("GenshinFarm.Core.Entities.Weapon", null)
+                        .WithMany("Materials")
+                        .HasForeignKey("WeaponId");
+                });
+
             modelBuilder.Entity("GenshinFarm.Core.Entities.Talent", b =>
                 {
                     b.HasOne("GenshinFarm.Core.Entities.Character", "Character")
@@ -407,28 +492,17 @@ namespace GenshinFarm.Api.Migrations
                     b.Navigation("Character");
                 });
 
-            modelBuilder.Entity("GenshinFarm.Core.Entities.UserElement", b =>
+            modelBuilder.Entity("GenshinFarm.Core.Entities.Team", b =>
                 {
+                    b.HasOne("GenshinFarm.Core.Entities.Character", null)
+                        .WithMany("Teams")
+                        .HasForeignKey("CharacterId");
+
                     b.HasOne("GenshinFarm.Core.Entities.User", "User")
-                        .WithMany("UserElement")
+                        .WithMany("Teams")
                         .HasForeignKey("UserId");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("UserWeapon", b =>
-                {
-                    b.HasOne("GenshinFarm.Core.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("GenshinFarm.Core.Entities.Weapon", null)
-                        .WithMany()
-                        .HasForeignKey("WeaponsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("GenshinFarm.Core.Entities.AscMaterial", b =>
@@ -442,12 +516,25 @@ namespace GenshinFarm.Api.Migrations
                 {
                     b.Navigation("AscensionMaterials");
 
+                    b.Navigation("CharacterWeapon");
+
                     b.Navigation("Talents");
+
+                    b.Navigation("Teams");
                 });
 
             modelBuilder.Entity("GenshinFarm.Core.Entities.User", b =>
                 {
-                    b.Navigation("UserElement");
+                    b.Navigation("CharacterWeapons");
+
+                    b.Navigation("Teams");
+                });
+
+            modelBuilder.Entity("GenshinFarm.Core.Entities.Weapon", b =>
+                {
+                    b.Navigation("CharacterWeapon");
+
+                    b.Navigation("Materials");
                 });
 #pragma warning restore 612, 618
         }

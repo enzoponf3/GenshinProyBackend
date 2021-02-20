@@ -14,6 +14,9 @@ namespace GenshinFarm.Infrastructure.Repositories
         private readonly BaseRepository<Talent> _talentRepository;
         private readonly BaseRepository<Weapon> _weaponLocationRepository;
         private readonly UserRepository _userLocationRepository;
+        private readonly BaseRepository<Team> _teamRepository;
+        private readonly BaseRepository<CharacterWeapon> _characterWeaponRepository;
+        private readonly AscensionCategoryRepository _ascensionCategoryRepository;
 
         public UnitOfWork(GenshinDbContext context)
         {
@@ -25,6 +28,9 @@ namespace GenshinFarm.Infrastructure.Repositories
         public IRepository<Talent> TalentRepository => _talentRepository ?? new BaseRepository<Talent>(_context);
         public IRepository<Weapon> WeaponRepository => _weaponLocationRepository ?? new BaseRepository<Weapon>(_context);
         public IUserRepository UserRepository => _userLocationRepository ?? new UserRepository(_context);
+        public IRepository<Team> TeamRepository => _teamRepository ?? new BaseRepository<Team>(_context);
+        public IRepository<CharacterWeapon> CharacterWeaponRepository => _characterWeaponRepository ?? new BaseRepository<CharacterWeapon>(_context);
+        public IAscensionRespository AscensionCategoryRepository => _ascensionCategoryRepository ?? new AscensionCategoryRepository(_context);
         public async Task SaveChangesAsync()
         {
             await _context.SaveChangesAsync();

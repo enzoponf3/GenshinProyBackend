@@ -131,59 +131,5 @@ namespace GenshinFarm.Api.Controllers
             if(await _userService.Delete(id)) { return BadRequest("User doesn't exists."); }
             return Ok();
         }
-        /// <summary>
-        /// Link a user with an elemnt by id.
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="userElementDto"></param>
-        /// <returns></returns>
-        [HttpPost("{id}")]
-        [ProducesResponseType((int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [Authorize]
-        public async Task<ActionResult> AddElement(string id, UserElementDto userElementDto)
-        {
-            userElementDto.Id = Guid.NewGuid().ToString();
-            var userElement = _mapper.Map<UserElement>(userElementDto);
-            userElement.setPowerLvl();
-            try
-            {
-                await _userService.AddElement(id, userElement);
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
-            return Ok();
-        }
-        /// <summary>
-        /// Link multiple elements to the User.
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="userElementsDto"></param>
-        /// <returns></returns>
-        [HttpPost("{id}")]
-        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(IEnumerable<UserElementDto>))]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [Authorize]
-        public async Task<ActionResult> AddElements(string id, ICollection<UserElementDto> userElementsDto)
-        {
-
-            ICollection<UserElement> userElements = _mapper.Map<ICollection<UserElement>>(userElementsDto);
-            foreach(UserElement elem in userElements)
-            {
-                elem.Id = Guid.NewGuid().ToString();
-                elem.setPowerLvl();
-            };
-            try
-            {
-                await _userService.AddElements(id, userElements);
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
-            return Ok(userElementsDto);
-        }
     }
 }

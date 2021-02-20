@@ -33,7 +33,7 @@ namespace GenshinFarm.Api.Controllers
         // GET: CharacterController
         [HttpGet(Name = nameof(Characters))]
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(IEnumerable<CharacterDto>))]
-        [Authorize]
+        //[Authorize]
         public ActionResult Characters()
         {
             var characters = _unitOfWork.CharacterRepository.GetAll();
