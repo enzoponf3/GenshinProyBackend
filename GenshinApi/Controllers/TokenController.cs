@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using GenshinFarm.Core.DTOs;
 using GenshinFarm.Core.Entities;
 using GenshinFarm.Core.Interfaces;
 using GenshinFarm.Infrastructure.Interfaces;
@@ -39,7 +40,7 @@ namespace GenshinFarm.Api.Controllers
         /// <param name="login"></param>
         /// <returns>JWT</returns>
         [HttpPost]
-        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.OK,Type = typeof(TokenDto))]
         [ProducesResponseType((int)HttpStatusCode.BadRequest, Type = typeof(UserLogin))]
         [ProducesResponseType((int)HttpStatusCode.NotFound, Type = typeof(UserLogin))]
         public async Task<IActionResult> Authentication(UserLogin login)
@@ -50,7 +51,7 @@ namespace GenshinFarm.Api.Controllers
                 if (validation.Item1)
                 {
                     var token = TokenGenerator(validation.Item2);
-                    return Ok(new { token });
+                    return Ok(token);
                 }
                 return BadRequest(login);
             }
@@ -67,7 +68,7 @@ namespace GenshinFarm.Api.Controllers
         /// <returns></returns>
         [HttpGet]
         [Authorize]
-        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(string))]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(TokenDto))]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<ActionResult> Refresh(string username)
         {
@@ -75,7 +76,7 @@ namespace GenshinFarm.Api.Controllers
             if (user != null)
             {
                 var token = TokenGenerator(user);
-                return Ok(new { token });
+                return Ok(token);
             }
             return NotFound();
         }
@@ -88,7 +89,7 @@ namespace GenshinFarm.Api.Controllers
             return (isValid, user);
         }
 
-        private string TokenGenerator(User user)
+        private TokenDto TokenGenerator(User user)
         {
             //Header
             var symetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Authentication:SecretKey"]));
@@ -107,15 +108,23 @@ namespace GenshinFarm.Api.Controllers
             //Payload
             var payload = new JwtPayload
             (
-                _configuration["Issuer"],
-                _configuration["Audience"],
+                _configuration["Authentication:Issuer"],
+                _configuration["Authentication:Audience"],
                 claims,
                 DateTime.Now,
                 DateTime.UtcNow.AddDays(7)
             );
 
             var token = new JwtSecurityToken(header, payload);
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            var formedToken = new JwtSecurityTokenHandler().WriteToken(token);
+            TokenDto tokenDto = new TokenDto
+            {
+                UserId = user.Id,
+                Username = user.Username,
+                Email = user.Email,
+                Token = formedToken
+            };
+            return tokenDto;
         }
     }
 }

@@ -39,6 +39,7 @@ namespace GenshinFarm.Api.Controllers
         {
             User user = await _unitOfWork.UserRepository.GetById(userId);
             ICollection<Team> teams = user.Teams;
+            if(teams.Count == 0) { return NotFound("Looks like the User doesn't have teams."); }
             return Ok(teams);
         }
         /// <summary>
@@ -121,11 +122,11 @@ namespace GenshinFarm.Api.Controllers
         }
         [HttpPut]
         [Authorize]
-        public async Task<ActionResult> AddCharacter(string teamId, CharacterDto characterDto, WeaponDto weaponDto, int charLvl, int weaponLvl)
+        public async Task<ActionResult> AddCharacter(string teamId, string characterId, string weaponId, int charLvl, int weaponLvl)
         {
             Team team = await _unitOfWork.TeamRepository.GetById(teamId);
-            Character character = _mapper.Map<Character>(characterDto);
-            Weapon weapon = _mapper.Map<Weapon>(weaponDto);
+            Character character = await _unitOfWork.CharacterRepository.GetById(characterId);
+            Weapon weapon = await _unitOfWork.WeaponRepository.GetById(weaponId);
             CharacterWeapon characterWeapon = new CharacterWeapon(charLvl)
             {
                 Character = character,
